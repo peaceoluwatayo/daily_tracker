@@ -1,7 +1,8 @@
 import streamlit as st
-from database import add_user, authenticate_user
+from database import add_user, authenticate_user, verify_user_token
 from dotenv import load_dotenv
 import os
+import urllib.parse
 
 # Brevo email libraries
 import sib_api_v3_sdk
@@ -12,26 +13,32 @@ load_dotenv()
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL")
 
-# Initialize session state to track current page
-if "page" not in st.session_state:
-    st.session_state.page = "login"  # Default page is login
+# Base URL for verification link (adjust if deployed)
+BASE_URL = "http://localhost:8501"  # Update to actual URL after deployment
 
-# Function to send confirmation email using Brevo
-def send_confirmation_email(user_email, username):
+# Initialize session state
+if "page" not in st.session_state:
+    st.session_state.page = "login"
+
+# Send verification email using Brevo
+def send_confirmation_email(user_email, username, token):
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = BREVO_API_KEY
 
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
 
-    subject = "Welcome to Daily Journal Tracker!"
+    verify_link = f"{BASE_URL}?verify={urllib.parse.quote(token)}"
+
+    subject = "Confirm Your Daily Journal Tracker Account"
     html_content = f"""
     <html>
       <body>
         <h2>Hello {username},</h2>
-        <p>Thanks for signing up with <b>Daily Journal Tracker</b> 🎉</p>
-        <p>You can now start tracking your goals and progress daily.</p>
+        <p>Thanks for signing up for <b>Daily Journal Tracker</b> 🎉</p>
+        <p>Please confirm your email address by clicking the link below:</p>
+        <p><a href="{verify_link}">Verify My Account</a></p>
         <br>
-        <p>Cheers, <br> The Daily Tracker Team</p>
+        <p>Cheers,<br>The Daily Tracker Team</p>
       </body>
     </html>
     """
@@ -47,8 +54,8 @@ def send_confirmation_email(user_email, username):
     )
 
     try:
-        response = api_instance.send_transac_email(email)
-        st.success("✅ Confirmation email sent successfully!")
+        api_instance.send_transac_email(email)
+        st.success("✅ A verification email has been sent. Please check your inbox.")
     except ApiException as e:
         st.error(f"❌ Failed to send email: {e}")
 
@@ -61,45 +68,70 @@ def show_login():
 
     if st.button("Login"):
         if username and password:
-            if authenticate_user(username, password):
+            result = authenticate_user(username, password)
+            if result == "unverified":
+                st.warning("⚠️ Please verify your email before logging in.")
+            elif result == "success":
                 st.success(f"Welcome back, {username}! 👋")
-                # Proceed to user dashboard here
+                # Show main app/dashboard here
             else:
                 st.error("❌ Invalid username or password.")
         else:
             st.warning("Please enter both username and password.")
 
-    if st.button("Don't have an account? Sign Up"):
-        st.session_state.page = "signup"
-        st.rerun()
+    # Display message and button on the same line with balanced space
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown("<p style='margin-bottom: 0;'>Don't have an account?</p>", unsafe_allow_html=True)
+    with col2:
+        if st.button("Sign Up"):
+            st.session_state.page = "signup"
+            st.rerun()
 
 # Signup Page
 def show_signup():
     st.title("🆕 Create New Account")
-    
+
     new_user = st.text_input("Choose a username")
     new_pass = st.text_input("Choose a password", type="password")
     email = st.text_input("Enter your email address")
 
     if st.button("Sign Up"):
         if new_user and new_pass and email:
-            success = add_user(new_user, new_pass)
+            success, token = add_user(new_user, new_pass, email)
             if success:
-                send_confirmation_email(email, new_user)
-                st.success("✅ Account created successfully! You can now login.")
-                st.session_state.page = "login"
-                st.rerun()
+                send_confirmation_email(email, new_user, token)
             else:
                 st.warning("⚠️ Username already exists. Please choose another.")
         else:
-            st.warning("Please enter all required fields.")
+            st.warning("Please fill in all fields.")
 
-    if st.button("Already have an account? Login"):
+    # Display message and button on the same line with balanced space
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown("<p style='margin-bottom: 0;'>Already have an account?</p>", unsafe_allow_html=True)
+    with col2:
+        if st.button("Login"):
+            st.session_state.page = "login"
+            st.rerun()
+
+# Email verification handler
+def handle_verification():
+    query_params = st.query_params
+    token = query_params.get("verify")
+
+    if token:
+        verified = verify_user_token(token)
+        if verified:
+            st.success("✅ Your account has been verified! You can now login.")
+        else:
+            st.error("❌ Invalid or expired verification link.")
         st.session_state.page = "login"
-        st.rerun()
 
 # Main App Logic
 def main():
+    handle_verification()
+
     if st.session_state.page == "login":
         show_login()
     elif st.session_state.page == "signup":
