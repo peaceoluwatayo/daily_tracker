@@ -39,12 +39,13 @@ def save_entry_to_db(entry):
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO DailyEntries (
-                entry_date, mood, breakfast, lunch, dinner, water_intake, exercise, 
+                username, entry_date, mood, breakfast, lunch, dinner, water_intake, exercise, 
                 family_social, friend_social, neighbour_social, stranger_social, 
                 sleep_quality, sleep_time, sleep_duration
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
+            entry["username"],
             datetime.now(),
             entry["mood"],
             entry["breakfast"],
@@ -65,6 +66,7 @@ def save_entry_to_db(entry):
         return True, "Entry saved successfully!"
     except Exception as e:
         return False, f"Failed to save entry: {str(e)}"
+
 
 # Streamlit UI
 st.title("📝 Daily Journal Tracker")
@@ -126,20 +128,22 @@ if check_entry_exists():
 else:
     if st.button("Submit Entry"):
         entry = {
-            "mood": mood,
-            "breakfast": breakfast,
-            "lunch": lunch,
-            "dinner": dinner,
-            "water": water,
-            "exercise": exercise,
-            "family_social": family_social,
-            "friend_social": friend_social,
-            "neighbour_social": neighbour_social,
-            "stranger_social": stranger_social,
-            "sleep_quality": sleep_quality,
-            "sleep_time": sleep_time,
-            "sleep_duration": sleep_duration
-        }
+        "username": st.session_state.get("username"), 
+        "mood": mood,
+        "breakfast": breakfast,
+        "lunch": lunch,
+        "dinner": dinner,
+        "water": water,
+        "exercise": exercise,
+        "family_social": family_social,
+        "friend_social": friend_social,
+        "neighbour_social": neighbour_social,
+        "stranger_social": stranger_social,
+        "sleep_quality": sleep_quality,
+        "sleep_time": sleep_time,
+        "sleep_duration": sleep_duration
+    }
+
 
         success, message = save_entry_to_db(entry)
         if success:

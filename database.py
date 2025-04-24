@@ -4,8 +4,9 @@ import os
 import bcrypt
 from dotenv import load_dotenv
 import urllib.parse
-from sib_api_v3_sdk import Configuration, ApiClient, TransactionalEmailsApi, SendSmtpEmail
 from sib_api_v3_sdk.rest import ApiException
+from datetime import datetime
+import streamlit as st
 
 # Load environment variables
 load_dotenv()
@@ -112,47 +113,57 @@ def reset_password(token, new_password):
         print("Reset password error:", e)
         return False
 
-def send_password_reset_email(email):
+# Function to check if the user has filled the form for today
+def has_filled_form_today(username):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    today = datetime.now().date()  # Get today's date (without time)
+    query = """
+        SELECT COUNT(*) FROM DailyEntries
+        WHERE username = ? AND CAST(entry_date AS DATE) = ?
+    """
+    cursor.execute(query, (username, today))
+    result = cursor.fetchone()
+    conn.close()
+    
+    return result[0] > 0 
+
+# Function to save entry to the database
+def save_entry_to_db(entry):
     try:
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT username, token FROM Users WHERE email = ?", email)
-            row = cursor.fetchone()
-            if row:
-                username, token = row
-                reset_link = f"{BASE_URL}?reset={urllib.parse.quote(token)}"
-                subject = "Reset Your Password - Daily Journal Tracker"
-                html_content = f"""
-                <html>
-                    <body>
-                        <h2>Hello {username},</h2>
-                        <p>We received a request to reset your password.</p>
-                        <p>Click the link below to create a new password:</p>
-                        <p><a href="{reset_link}">Reset My Password</a></p>
-                        <br>
-                        <p>If you didn’t request this, you can safely ignore this email.</p>
-                        <p>Cheers,<br>The Daily Tracker Team</p>
-                    </body>
-                </html>
-                """
-
-                configuration = Configuration()
-                configuration.api_key['api-key'] = BREVO_API_KEY
-                api_instance = TransactionalEmailsApi(ApiClient(configuration))
-
-                email_content = SendSmtpEmail(
-                    to=[{"email": email, "name": username}],
-                    sender={"name": "Daily Journal", "email": SENDER_EMAIL},
-                    subject=subject,
-                    html_content=html_content
-                )
-
-                api_instance.send_transac_email(email_content)
-                return True
-            return False
-    except ApiException as e:
-        print("Brevo API error:", e)
-        return False
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO DailyEntries (
+                username,
+                entry_date, mood, breakfast, lunch, dinner, water_intake, exercise, 
+                family_social, friend_social, neighbour_social, stranger_social, 
+                sleep_quality, sleep_time, sleep_duration
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            entry["username"], 
+            datetime.now(), 
+            entry["mood"], 
+            entry["breakfast"], 
+            entry["lunch"], 
+            entry["dinner"], 
+            entry["water"], 
+            entry["exercise"], 
+            entry["family_social"], 
+            entry["friend_social"], 
+            entry["neighbour_social"], 
+            entry["stranger_social"], 
+            entry["sleep_quality"], 
+            entry["sleep_time"], 
+            entry["sleep_duration"]
+        ))
+        conn.commit()
+        conn.close()
+        # Automatically mark as filled for today
+        st.session_state['has_filled_form'] = True
     except Exception as e:
-        print("Password reset error:", e)
-        return False
+        st.error(f"Failed to save entry: {str(e)}")
+
+
