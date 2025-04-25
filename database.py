@@ -161,8 +161,6 @@ def save_entry_to_db(entry):
         ))
         conn.commit()
         conn.close()
-        # Automatically mark as filled for today
-        st.session_state['has_filled_form'] = True
     except Exception as e:
         st.error(f"Failed to save entry: {str(e)}")
 
