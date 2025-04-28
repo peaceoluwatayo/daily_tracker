@@ -137,24 +137,18 @@ def save_entry_to_db(entry):
         cursor.execute("""
             INSERT INTO DailyEntries (
                 username,
-                entry_date, mood, breakfast, lunch, dinner, water_intake, exercise, 
-                family_social, friend_social, neighbour_social, stranger_social, 
+                entry_date, mood, food, water_intake, exercise, social,
                 sleep_quality, sleep_time, sleep_duration
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             entry["username"], 
-            datetime.now(), 
+            datetime.now(),
             entry["mood"], 
-            entry["breakfast"], 
-            entry["lunch"], 
-            entry["dinner"], 
+            entry["food"],  
             entry["water"], 
             entry["exercise"], 
-            entry["family_social"], 
-            entry["friend_social"], 
-            entry["neighbour_social"], 
-            entry["stranger_social"], 
+            entry["social"], 
             entry["sleep_quality"], 
             entry["sleep_time"], 
             entry["sleep_duration"]
@@ -163,5 +157,4 @@ def save_entry_to_db(entry):
         conn.close()
     except Exception as e:
         st.error(f"Failed to save entry: {str(e)}")
-
 

@@ -66,9 +66,8 @@ def show_history():
         if start_date:
             cursor.execute("""
                 SELECT 
-                    entry_date, mood, breakfast, lunch, dinner, water_intake, exercise, 
-                    family_social, friend_social, neighbour_social, stranger_social, 
-                    sleep_quality, sleep_time, sleep_duration
+                    entry_date, mood, food, water_intake, exercise, 
+                    social, sleep_quality, sleep_time, sleep_duration
                 FROM DailyEntries
                 WHERE username = ? AND entry_date >= ?
                 ORDER BY entry_date DESC
@@ -76,9 +75,8 @@ def show_history():
         else:
             cursor.execute("""
                 SELECT 
-                    entry_date, mood, breakfast, lunch, dinner, water_intake, exercise, 
-                    family_social, friend_social, neighbour_social, stranger_social, 
-                    sleep_quality, sleep_time, sleep_duration
+                    entry_date, mood, food, water_intake, exercise, 
+                    social, sleep_quality, sleep_time, sleep_duration
                 FROM DailyEntries
                 WHERE username = ?
                 ORDER BY entry_date DESC
@@ -94,9 +92,8 @@ def show_history():
         df = pd.DataFrame.from_records(
             rows,
             columns=[
-                "Date", "Mood", "Breakfast", "Lunch", "Dinner", "Water Intake", "Exercise",
-                "Family Social", "Friend Social", "Neighbour Social", "Stranger Social",
-                "Sleep Quality", "Sleep Time", "Sleep Duration"
+                "Date", "Mood", "Food", "Water Intake", "Exercise",
+                "Social", "Sleep Quality", "Sleep Time", "Sleep Duration"
             ]
         )
 
