@@ -140,6 +140,7 @@ def save_entry_to_db(entry):
                 entry_date, mood, food, water_intake, exercise, social,
                 sleep_quality, sleep_time, sleep_duration
             )
+            OUTPUT INSERTED.entry_id
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             entry["username"], 
@@ -153,8 +154,42 @@ def save_entry_to_db(entry):
             entry["sleep_time"], 
             entry["sleep_duration"]
         ))
+        
+        entry_id = cursor.fetchone()[0]  # Capture the newly inserted entry_id
+        conn.commit()
+        conn.close()
+        return entry_id
+    
+    except Exception as e:
+        st.error(f"Failed to save entry: {str(e)}")
+        return None
+
+ # Function to save scores to the database   
+def save_scores_to_db(scores):
+    try:
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO DailyScores (
+                entry_id, username, entry_date,
+                mood_score, food_score, water_score, exercise_score, social_score,
+                sleep_quality_score, sleep_time_score, sleep_duration_score
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            scores["entry_id"],
+            scores["username"],
+            datetime.now(),
+            scores["mood_score"],
+            scores["food_score"],
+            scores["water_score"],
+            scores["exercise_score"],
+            scores["social_score"],
+            scores["sleep_quality_score"],
+            scores["sleep_time_score"],
+            scores["sleep_duration_score"]
+        ))
         conn.commit()
         conn.close()
     except Exception as e:
-        st.error(f"Failed to save entry: {str(e)}")
-
+        st.error(f"Failed to save scores: {str(e)}")
