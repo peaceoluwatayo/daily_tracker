@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime, timedelta
-from PIL import Image
-from streamlit_autorefresh import st_autorefresh
 from database import get_user_entries_from_db, get_user_score_from_db
 
 # ======================= #

@@ -3,8 +3,6 @@ import uuid
 import os
 import bcrypt
 from dotenv import load_dotenv
-import urllib.parse
-from sib_api_v3_sdk.rest import ApiException
 from datetime import datetime
 import streamlit as st
 import pandas as pd

@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
 
+# Load environment variables
+load_dotenv()
+
 # Database credentials
 DB_SERVER = os.getenv("DB_SERVER")
 DB_NAME = os.getenv("DB_NAME")
