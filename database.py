@@ -7,6 +7,7 @@ import urllib.parse
 from sib_api_v3_sdk.rest import ApiException
 from datetime import datetime
 import streamlit as st
+import pandas as pd
 
 # Load environment variables
 load_dotenv()
@@ -193,3 +194,89 @@ def save_scores_to_db(scores):
         conn.close()
     except Exception as e:
         st.error(f"Failed to save scores: {str(e)}")
+
+
+def get_user_entries_from_db(username):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT entry_date, mood, food, water_intake, exercise,
+                   social, sleep_quality, sleep_time, sleep_duration
+            FROM DailyEntries
+            WHERE username = ?
+            ORDER BY entry_date DESC
+        """, (username,))
+        
+        rows = cursor.fetchall()
+        conn.close()
+
+        data = []
+        for row in rows:
+            data.append({
+                "entry_date": row[0],
+                "mood": row[1],
+                "food": row[2],
+                "water_intake": row[3],
+                "exercise": row[4],
+                "social": row[5],
+                "sleep_quality": row[6],
+                "sleep_time": row[7],
+                "sleep_duration": row[8]
+            })
+
+        df = pd.DataFrame(data)
+        df['entry_date'] = pd.to_datetime(df['entry_date']).dt.strftime("%Y-%m-%d %H:%M")
+        
+        return df
+
+    except Exception as e:
+        st.error(f"Failed to retrieve user entries: {str(e)}")
+        return pd.DataFrame()
+
+    
+
+def get_user_score_from_db(username):
+    try:
+        conn = get_connection()  # Ensure you have a correct DB connection
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT entry_date, mood_score, food_score, water_score, exercise_score,
+                  social_score, sleep_quality_score, sleep_time_score, sleep_duration_score
+            FROM DailyScores
+            WHERE username = ?
+            ORDER BY entry_date DESC
+        """, (username,))
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        # Convert rows into a pandas DataFrame
+        data = []
+        for row in rows:
+            data.append({
+                "entry_date": row[0],  # entry_date should be a datetime object here
+                "mood_score": row[1],
+                "food_score": row[2],
+                "water_score": row[3],
+                "exercise_score": row[4],
+                "social_score": row[5],
+                "sleep_quality_score": row[6],
+                "sleep_time_score": row[7],
+                "sleep_duration_score": row[8]
+            })
+
+        df = pd.DataFrame(data)
+
+        # Apply conversion to datetime and format it
+        df['entry_date'] = pd.to_datetime(df['entry_date']).dt.strftime("%Y-%m-%d %H:%M")
+        
+        # st.write("Processed Data:")
+        # st.write(df)  # This will show the formatted data
+        
+        return df
+
+    except Exception as e:
+        st.error(f"Failed to retrieve user scores: {str(e)}")
+        return pd.DataFrame()
+
