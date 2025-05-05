@@ -44,7 +44,7 @@ def show_tracker_form():
         "Choose an option", "Gym", "Cycle", "Run", "Walk", "I didn't exercise today"
     ])
 
-    social_choices = st.multiselect("5. Did you Socialise today? (Select all that apply)", [
+    social_choices = st.multiselect("5. Did you socialise today? (Select all that apply)", [
         "Family - In Person", "Family - By Phone", "Family - By Text/Message", "Family - I didn't socialize with family today",
         "Friends - In Person", "Friends - By Phone", "Friends - By Text/Message", "Friends - I didn't socialize with friends today",
         "Neighbour - In Person", "Neighbour - By Phone", "Neighbour - By Text/Message", "Neighbour - I didn't socialize with neighbour today",
