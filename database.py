@@ -160,7 +160,7 @@ def save_entry_to_db(entry):
         return entry_id
     
     except Exception as e:
-        st.error(f"Failed to save entry: {str(e)}")
+        print(f"Failed to save entry: {str(e)}")
         return None
 
  # Function to save scores to the database   
@@ -191,7 +191,7 @@ def save_scores_to_db(scores):
         conn.commit()
         conn.close()
     except Exception as e:
-        st.error(f"Failed to save scores: {str(e)}")
+        print(f"Failed to save scores: {str(e)}")
 
 
 def get_user_entries_from_db(username):
@@ -229,7 +229,7 @@ def get_user_entries_from_db(username):
         return df
 
     except Exception as e:
-        st.error(f"Failed to retrieve user entries: {str(e)}")
+        print(f"Failed to retrieve user entries: {str(e)}")
         return pd.DataFrame()
 
     
@@ -275,6 +275,6 @@ def get_user_score_from_db(username):
         return df
 
     except Exception as e:
-        st.error(f"Failed to retrieve user scores: {str(e)}")
+        print(f"Failed to retrieve user scores: {str(e)}")
         return pd.DataFrame()
 

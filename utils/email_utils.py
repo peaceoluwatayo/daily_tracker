@@ -23,18 +23,25 @@ def send_confirmation_email(user_email, username, token):
     subject = "Confirm Your Daily Journal Tracker Account"
     html_content = f"""
     <html>
-        <body>
-            <h2>Hello {username},</h2>
-            <p>Thanks for signing up for <b>Daily Journal Tracker</b> 🎉</p>
-            <p>Click below to confirm your email address:</p>
-            <p><a href="{verify_link}">Verify My Account</a></p>
-            <p>Cheers,<br>The Daily Tracker Team</p>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px;">
+            <p style="margin-bottom: 20px;">Hello {username},</p>
+            <p style="margin-bottom: 15px;">Thanks for signing up for Daily Journal Tracker. </p>
+            <p style="margin-bottom: 15px;">Click the button below to confirm your email address:</p>
+            <p style="margin-bottom: 30px;">
+                <a href="{verify_link}" 
+                style="display: inline-block; padding: 10px 20px; background-color: #007BFF; 
+                        color: white; text-decoration: none; border-radius: 5px;">
+                Verify My Account
+                </a>
+            </p>
+            <p style="margin-top: 40px;">Cheers,<br>The Daily Journal Tracker Team</p>
         </body>
     </html>
     """
+
     email = sib_api_v3_sdk.SendSmtpEmail(
         to=[{"email": user_email, "name": username}],
-        sender={"name": "Daily Journal", "email": SENDER_EMAIL},
+        sender={"name": "Daily Journal Tracker", "email": SENDER_EMAIL},
         subject=subject,
         html_content=html_content
     )
@@ -57,14 +64,19 @@ def send_password_reset_email(email):
                 subject = "Reset Your Password - Daily Journal Tracker"
                 html_content = f"""
                 <html>
-                    <body>
-                        <h2>Hello {username},</h2>
-                        <p>We received a request to reset your password.</p>
-                        <p>Click the link below to create a new password:</p>
-                        <p><a href="{reset_link}">Reset My Password</a></p>
-                        <br>
-                        <p>If you didn’t request this, you can safely ignore this email.</p>
-                        <p>Cheers,<br>The Daily Tracker Team</p>
+                    <body style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px;">
+                        <p style="margin-bottom: 20px;">Hello {username},</p>
+                        <p style="margin-bottom: 15px;">We received a request to reset your password.</p>
+                        <p style="margin-bottom: 15px;">Click the button below to create a new password:</p>
+                        <p style="margin-bottom: 30px;">
+                            <a href="{reset_link}" 
+                            style="display: inline-block; padding: 10px 20px; background-color: #007BFF; 
+                                    color: white; text-decoration: none; border-radius: 5px;">
+                            Reset My Password
+                            </a>
+                        </p>
+                        <p style="margin-bottom: 15px;">If you didn’t request this, you can safely ignore this email.</p>
+                        <p style="margin-top: 40px;">Cheers,<br>The Daily Journal Tracker Team</p>
                     </body>
                 </html>
                 """
@@ -75,7 +87,7 @@ def send_password_reset_email(email):
 
                 email_content = SendSmtpEmail(
                     to=[{"email": email, "name": username}],
-                    sender={"name": "Daily Journal", "email": SENDER_EMAIL},
+                    sender={"name": "Daily Journal Tracker", "email": SENDER_EMAIL},
                     subject=subject,
                     html_content=html_content
                 )

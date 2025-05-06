@@ -112,7 +112,7 @@ def plot_pie_chart(df, column, title, color_sequence=px.colors.sequential.Blues)
 # ======================= #
 
 def show_dashboard():
-    st.title("📊 Dashboard")
+    st.markdown("<h1 style='text-align: center;'>📊 Dashboard</h1>", unsafe_allow_html=True)
 
     # Navigation
     col1, col2 = st.columns([8, 1])

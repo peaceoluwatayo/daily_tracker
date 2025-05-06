@@ -23,7 +23,7 @@ conn_str = (
 )
 
 def show_history():
-    st.title("📜 History")
+    st.markdown("<h1 style='text-align: center;'>📜 History</h1>", unsafe_allow_html=True)
 
     # Place Back to Home on the left and Logout on the right
     col1, col2 = st.columns([8, 1])

@@ -2,7 +2,7 @@ import streamlit as st
 from database import save_entry_to_db, save_scores_to_db, has_filled_form_today
 
 def show_tracker_form():
-    st.title("📝 Daily Tracker Form")
+    st.markdown("<h1 style='text-align: center;'>📝 Daily Tracker Form</h1>", unsafe_allow_html=True)
 
     col1, col2 = st.columns([8, 1])
     with col1:
