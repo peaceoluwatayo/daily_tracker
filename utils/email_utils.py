@@ -23,19 +23,21 @@ def send_confirmation_email(user_email, username, token):
     subject = "Confirm Your Daily Journal Tracker Account"
     html_content = f"""
     <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px;">
-            <p style="margin-bottom: 20px;">Hello {username},</p>
-            <p style="margin-bottom: 15px;">Thanks for signing up for Daily Journal Tracker. </p>
-            <p style="margin-bottom: 15px;">Click the button below to confirm your email address:</p>
-            <p style="margin-bottom: 30px;">
-                <a href="{verify_link}" 
-                style="display: inline-block; padding: 10px 20px; background-color: #007BFF; 
-                        color: white; text-decoration: none; border-radius: 5px;">
-                Verify My Account
-                </a>
-            </p>
-            <p style="margin-top: 40px;">Cheers,<br>The Daily Journal Tracker Team</p>
-        </body>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f5f5f5; font-size: 16px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px;">
+        <p style="margin-bottom: 20px;">Hello {username},</p>
+        <p style="margin-bottom: 15px;">Thanks for signing up for Daily Journal Tracker.</p>
+        <p style="margin-bottom: 15px;">Click the button below to confirm your email address:</p>
+        <p style="margin-bottom: 30px; text-align: center;">
+            <a href="{verify_link}" 
+            style="display: inline-block; padding: 10px 20px; background-color: #007BFF; 
+                    color: white; text-decoration: none; border-radius: 5px;">
+            Verify My Account
+            </a>
+        </p>
+        <p style="margin-top: 40px;">Cheers,<br>The Daily Journal Tracker Team</p>
+        </div>
+    </body>
     </html>
     """
 
@@ -64,20 +66,22 @@ def send_password_reset_email(email):
                 subject = "Reset Your Password - Daily Journal Tracker"
                 html_content = f"""
                 <html>
-                    <body style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px;">
-                        <p style="margin-bottom: 20px;">Hello {username},</p>
-                        <p style="margin-bottom: 15px;">We received a request to reset your password.</p>
-                        <p style="margin-bottom: 15px;">Click the button below to create a new password:</p>
-                        <p style="margin-bottom: 30px;">
-                            <a href="{reset_link}" 
-                            style="display: inline-block; padding: 10px 20px; background-color: #007BFF; 
-                                    color: white; text-decoration: none; border-radius: 5px;">
-                            Reset My Password
-                            </a>
-                        </p>
-                        <p style="margin-bottom: 15px;">If you didn’t request this, you can safely ignore this email.</p>
-                        <p style="margin-top: 40px;">Cheers,<br>The Daily Journal Tracker Team</p>
-                    </body>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f5f5f5;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; font-size: 16px;">
+                    <p style="margin-bottom: 20px;">Hello {username},</p>
+                    <p style="margin-bottom: 15px;">We received a request to reset your password.</p>
+                    <p style="margin-bottom: 15px;">Click the button below to create a new password:</p>
+                    <p style="margin-bottom: 30px; text-align: center;">
+                        <a href="{reset_link}" 
+                        style="display: inline-block; padding: 10px 20px; background-color: #007BFF; 
+                                color: white; text-decoration: none; border-radius: 5px;">
+                        Reset My Password
+                        </a>
+                    </p>
+                    <p style="margin-bottom: 15px;">If you didn’t request this, you can safely ignore this email.</p>
+                    <p style="margin-top: 40px;">Cheers,<br>The Daily Journal Tracker Team</p>
+                    </div>
+                </body>
                 </html>
                 """
 
