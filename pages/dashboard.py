@@ -33,13 +33,25 @@ def plot_category_distribution(df, column, title):
         counts = df[column].value_counts().reset_index()
         counts.columns = [label_col, 'Count']
         fig = px.bar(counts, x=label_col, y='Count', color=label_col,
-                     title=title,
+                     title=None,
                      color_discrete_sequence=px.colors.qualitative.Set3)
         
-        # Remove grid lines
         fig.update_layout(
-            xaxis=dict(showgrid=False),  # Remove grid lines on the x-axis
-            yaxis=dict(showgrid=False)   # Remove grid lines on the y-axis
+            annotations=[
+                dict(
+                    text=title,
+                    x=0.5,
+                    xref='paper',
+                    y=1.15,
+                    yref='paper',
+                    showarrow=False,
+                    font=dict(size=20, color="white"),
+                    xanchor='center'
+                )
+            ],
+            xaxis=dict(showgrid=False),
+            yaxis=dict(showgrid=False),
+            margin=dict(t=80)
         )
 
         st.plotly_chart(fig, config={
@@ -61,24 +73,35 @@ def plot_line_chart(df, column, title, color_sequence=None):
             chart_data,
             x='entry_date',
             y=column,
-            title=title,
             markers=True,
             color_discrete_sequence=color_sequence or px.colors.qualitative.Safe
         )
 
-        # Format x-axis to show date as '02 May 2025'
         fig.update_layout(
+            annotations=[
+                dict(
+                    text=title,
+                    x=0.5,
+                    xref='paper',
+                    y=1.15,
+                    yref='paper',
+                    showarrow=False,
+                    font=dict(size=20, color="white"),
+                    xanchor='center'
+                )
+            ],
             xaxis_title="Date",
             yaxis_title=column.replace('_', ' ').title(),
             xaxis=dict(
-                tickformat="%d %b %Y",  # 02 May 2025
+                tickformat="%d %b %Y",
                 tickangle=45,
                 tickfont=dict(size=10),
-                showgrid=False  # Remove grid lines on the x-axis
+                showgrid=False
             ),
             yaxis=dict(
-                showgrid=False  # Remove grid lines on the y-axis
-            )
+                showgrid=False
+            ),
+            margin=dict(t=80)
         )
 
         st.plotly_chart(fig, config={
@@ -98,9 +121,25 @@ def plot_pie_chart(df, column, title, color_sequence=px.colors.sequential.Blues)
             counts,
             names=label_col,
             values='Count',
-            title=title,
             color_discrete_sequence=color_sequence
         )
+
+        fig.update_layout(
+            annotations=[
+                dict(
+                    text=title,
+                    x=0.5,
+                    xref='paper',
+                    y=1.15,
+                    yref='paper',
+                    showarrow=False,
+                    font=dict(size=20, color="white"),
+                    xanchor='center'
+                )
+            ],
+            margin=dict(t=80)
+        )
+
         st.plotly_chart(fig, config={
             "displaylogo": False,
             "displayModeBar": False  # This hides the entire mode bar
