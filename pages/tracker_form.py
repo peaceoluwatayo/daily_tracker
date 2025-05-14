@@ -375,78 +375,106 @@ def show_tracker_form():
 
     if "form_step" not in st.session_state:
         st.session_state.form_step = 1
+    if "answers" not in st.session_state:
         st.session_state.answers = {}
 
     total_steps = 8
     progress = (st.session_state.form_step - 1) / total_steps
 
-    # STEP-BY-STEP FORM
     step = st.session_state.form_step
 
     def styled_question(question_text):
         st.markdown(f"<div style='font-size:22px; font-weight:bold;'>{question_text}</div>", unsafe_allow_html=True)
 
     def next_step():
-        st.session_state.form_step += 1
+        if st.session_state.form_step < total_steps:
+            st.session_state.form_step += 1
 
     def previous_step():
-        st.session_state.form_step -= 1
+        if st.session_state.form_step > 1:
+            st.session_state.form_step -= 1
+
+    answers = st.session_state.answers
 
     # Question Form
     if step == 1:
         styled_question("1. How are you feeling today?")
-        mood = st.selectbox("Mood", ["Choose an option", "Excited", "Happy", "Contented", "Low", "Depressed"], label_visibility="collapsed")
+        mood = st.selectbox(
+            "Mood",
+            ["Choose an option", "Excited", "Happy", "Contented", "Low", "Depressed"],
+            index=["Choose an option", "Excited", "Happy", "Contented", "Low", "Depressed"].index(answers.get("mood", "Choose an option")),
+            label_visibility="collapsed"
+        )
         if mood != "Choose an option":
-            st.session_state.answers["mood"] = mood
+            answers["mood"] = mood
             st.button("Next", on_click=next_step)
-            
 
     elif step == 2:
         styled_question("2. What did you eat today? (Select all that apply)")
-        food_choices = st.multiselect("Food Choices", [
-            "Breakfast - Health balanced (Fruit & Veg)",
-            "Breakfast - Easy food/Snacks",
-            "Breakfast - I didn't have breakfast today",
-            "Lunch - Health balanced (Fruit & Veg)",
-            "Lunch - Easy food/Snacks",
-            "Lunch - I didn't have lunch today",
-            "Dinner - Health balanced (Fruit & Veg)",
-            "Dinner - Easy food/Snacks",
-            "Dinner - I didn't have dinner today"
-        ], label_visibility="collapsed")
+        food_choices = st.multiselect(
+            "Food Choices",
+            options=[
+                "Breakfast - Health balanced (Fruit & Veg)",
+                "Breakfast - Easy food/Snacks",
+                "Breakfast - I didn't have breakfast today",
+                "Lunch - Health balanced (Fruit & Veg)",
+                "Lunch - Easy food/Snacks",
+                "Lunch - I didn't have lunch today",
+                "Dinner - Health balanced (Fruit & Veg)",
+                "Dinner - Easy food/Snacks",
+                "Dinner - I didn't have dinner today"
+            ],
+            default=answers.get("food_choices", []),
+            label_visibility="collapsed"
+        )
         if food_choices:
             has_breakfast = any("Breakfast" in f for f in food_choices)
             has_lunch = any("Lunch" in f for f in food_choices)
             has_dinner = any("Dinner" in f for f in food_choices)
 
             if has_breakfast and has_lunch and has_dinner:
-                st.session_state.answers["food_choices"] = food_choices
+                answers["food_choices"] = food_choices
                 st.button("Next", on_click=next_step)
             else:
                 st.warning("Please select at least one option for Breakfast, Lunch, and Dinner.")
 
     elif step == 3:
         styled_question("3. How was your water intake today?")
-        water = st.selectbox("Water Intake", ["Choose an option", "Adequate (>1 litre)", "Low (<1 litre)"], label_visibility="collapsed")
+        water = st.selectbox(
+            "Water Intake",
+            ["Choose an option", "Adequate (>1 litre)", "Low (<1 litre)"],
+            index=["Choose an option", "Adequate (>1 litre)", "Low (<1 litre)"].index(answers.get("water", "Choose an option")),
+            label_visibility="collapsed"
+        )
         if water != "Choose an option":
-            st.session_state.answers["water"] = water
+            answers["water"] = water
             st.button("Next", on_click=next_step)
 
     elif step == 4:
         styled_question("4. Did you exercise today?")
-        exercise = st.selectbox("Exercise", ["Choose an option", "Gym", "Cycle", "Run", "Walk", "I didn't exercise today"], label_visibility="collapsed")
+        exercise = st.selectbox(
+            "Exercise",
+            ["Choose an option", "Gym", "Cycle", "Run", "Walk", "I didn't exercise today"],
+            index=["Choose an option", "Gym", "Cycle", "Run", "Walk", "I didn't exercise today"].index(answers.get("exercise", "Choose an option")),
+            label_visibility="collapsed"
+        )
         if exercise != "Choose an option":
-            st.session_state.answers["exercise"] = exercise
+            answers["exercise"] = exercise
             st.button("Next", on_click=next_step)
 
     elif step == 5:
         styled_question("5. Did you socialise today? (Select all that apply)")
-        social_choices = st.multiselect("Social Choices", [
-            "Family - In Person", "Family - By Phone", "Family - By Text/Message", "Family - I didn't socialize with family today",
-            "Friends - In Person", "Friends - By Phone", "Friends - By Text/Message", "Friends - I didn't socialize with friends today",
-            "Neighbour - In Person", "Neighbour - By Phone", "Neighbour - By Text/Message", "Neighbour - I didn't socialize with neighbour today",
-            "Stranger - In Person", "Stranger - By Phone", "Stranger - By Text/Message", "Stranger - I didn't socialize with stranger today"
-        ], label_visibility="collapsed")
+        social_choices = st.multiselect(
+            "Social Choices",
+            options=[
+                "Family - In Person", "Family - By Phone", "Family - By Text/Message", "Family - I didn't socialize with family today",
+                "Friends - In Person", "Friends - By Phone", "Friends - By Text/Message", "Friends - I didn't socialize with friends today",
+                "Neighbour - In Person", "Neighbour - By Phone", "Neighbour - By Text/Message", "Neighbour - I didn't socialize with neighbour today",
+                "Stranger - In Person", "Stranger - By Phone", "Stranger - By Text/Message", "Stranger - I didn't socialize with stranger today"
+            ],
+            default=answers.get("social_choices", []),
+            label_visibility="collapsed"
+        )
         if social_choices:
             has_family = any("Family" in s for s in social_choices)
             has_friends = any("Friends" in s for s in social_choices)
@@ -454,37 +482,50 @@ def show_tracker_form():
             has_stranger = any("Stranger" in s for s in social_choices)
 
             if has_family and has_friends and has_neighbour and has_stranger:
-                st.session_state.answers["social_choices"] = social_choices
+                answers["social_choices"] = social_choices
                 st.button("Next", on_click=next_step)
             else:
                 st.warning("Please select at least one option for Family, Friends, Neighbour, and Stranger.")
 
     elif step == 6:
         styled_question("6. How was your sleep last night?")
-        sleep_quality = st.selectbox("Sleep Quality", ["Choose an option", "Excellent", "Good", "Average", "Poor", "Very poor"], label_visibility="collapsed")
+        sleep_quality = st.selectbox(
+            "Sleep Quality",
+            ["Choose an option", "Excellent", "Good", "Average", "Poor", "Very poor"],
+            index=["Choose an option", "Excellent", "Good", "Average", "Poor", "Very poor"].index(answers.get("sleep_quality", "Choose an option")),
+            label_visibility="collapsed"
+        )
         if sleep_quality != "Choose an option":
-            st.session_state.answers["sleep_quality"] = sleep_quality
+            answers["sleep_quality"] = sleep_quality
             st.button("Next", on_click=next_step)
 
     elif step == 7:
         styled_question("7. What time did you go to sleep last night?")
-        sleep_time = st.selectbox("Sleep Time", ["Choose an option", "9pm", "10pm", "11pm", "Midnight", "After Midnight"], label_visibility="collapsed")
+        sleep_time = st.selectbox(
+            "Sleep Time",
+            ["Choose an option", "9pm", "10pm", "11pm", "Midnight", "After Midnight"],
+            index=["Choose an option", "9pm", "10pm", "11pm", "Midnight", "After Midnight"].index(answers.get("sleep_time", "Choose an option")),
+            label_visibility="collapsed"
+        )
         if sleep_time != "Choose an option":
-            st.session_state.answers["sleep_time"] = sleep_time
+            answers["sleep_time"] = sleep_time
             st.button("Next", on_click=next_step)
 
     elif step == 8:
         styled_question("8. How many hours of sleep did you get last night?")
-        sleep_duration = st.selectbox("Sleep Duration", ["Choose an option", "Less than 3 hours", "3-4 hours", "5-6 hours", "7-8 hours", "8+ hours"], label_visibility="collapsed")
+        sleep_duration = st.selectbox(
+            "Sleep Duration",
+            ["Choose an option", "Less than 3 hours", "3-4 hours", "5-6 hours", "7-8 hours", "8+ hours"],
+            index=["Choose an option", "Less than 3 hours", "3-4 hours", "5-6 hours", "7-8 hours", "8+ hours"].index(answers.get("sleep_duration", "Choose an option")),
+            label_visibility="collapsed"
+        )
         if sleep_duration != "Choose an option":
-            st.session_state.answers["sleep_duration"] = sleep_duration
+            answers["sleep_duration"] = sleep_duration
             if st.button("Submit Entry"):
                 submit_entry(username)
 
-    # Progress bar at the bottom
     st.progress(progress)
 
-    # Previous button
     if step > 1:
         st.button("Previous", on_click=previous_step)
 
@@ -507,7 +548,6 @@ def submit_entry(username):
 
     entry_id = save_entry_to_db(entry)
 
-    # Scores
     mood_scores = {"Excited": 2, "Happy": 1, "Contented": 0, "Low": -1, "Depressed": -2}
     food_scores = {
         "Breakfast - Health balanced (Fruit & Veg)": 1,
