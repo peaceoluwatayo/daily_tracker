@@ -26,7 +26,7 @@ conn_str = (
     f'DRIVER={{ODBC Driver 18 for SQL Server}};'
     f'SERVER={DB_SERVER};DATABASE={DB_NAME};'
     f'UID={DB_USERNAME};PWD={DB_PASSWORD};'
-    f'Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;'
+    f'Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;'
 )
 
 def show_history():
