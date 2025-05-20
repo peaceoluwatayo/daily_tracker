@@ -111,6 +111,7 @@ import re
 from database import reset_password
 from captcha.image import ImageCaptcha
 from io import BytesIO
+from PIL import Image
 import random
 import string
 
@@ -129,8 +130,13 @@ def show_reset_password(token):
 
     # Generate CAPTCHA image in memory
     image = ImageCaptcha(width=280, height=90)
-    captcha_image = image.generate(st.session_state.captcha_text)
-    captcha_bytes = BytesIO(captcha_image.read())
+    captcha_data = image.generate(st.session_state.captcha_text).read()
+
+    # ✅ Convert binary data to a PIL Image for Streamlit
+    captcha_image = Image.open(BytesIO(captcha_data))
+
+    # captcha_image = image.generate(st.session_state.captcha_text)
+    # captcha_bytes = BytesIO(captcha_image.read())
 
     # Center content horizontally
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -187,7 +193,7 @@ def show_reset_password(token):
                     st.markdown(criterion)
 
             # CAPTCHA
-            st.image(captcha_bytes, caption="Enter the CAPTCHA text above")
+            st.image(captcha_image, caption="Enter the CAPTCHA text above")
             captcha_input = st.text_input("Enter CAPTCHA")
 
             if st.button("Reset Password"):

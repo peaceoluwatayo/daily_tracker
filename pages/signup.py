@@ -115,6 +115,7 @@ import random
 import string
 from captcha.image import ImageCaptcha
 from io import BytesIO
+from PIL import Image
 from database import add_user
 from utils.email_utils import send_confirmation_email
 
@@ -147,8 +148,13 @@ def show_signup():
 
     # Generate CAPTCHA image in memory
     image = ImageCaptcha(width=280, height=90)
-    captcha_image = image.generate(st.session_state.captcha_text)
-    captcha_bytes = BytesIO(captcha_image.read())
+    captcha_data = image.generate(st.session_state.captcha_text).read()
+
+    # ✅ Convert binary data to a PIL Image for Streamlit
+    captcha_image = Image.open(BytesIO(captcha_data))
+
+    # captcha_image = image.generate(st.session_state.captcha_text)
+    # captcha_bytes = BytesIO(captcha_image.read())
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -183,7 +189,7 @@ def show_signup():
             email = st.text_input("Enter your email address")
 
             # CAPTCHA
-            st.image(captcha_bytes, caption="Enter the CAPTCHA text above")
+            st.image(captcha_image, caption="Enter the CAPTCHA text above")
             captcha_input = st.text_input("Enter CAPTCHA")
 
             # Sign Up button

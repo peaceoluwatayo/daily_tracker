@@ -102,6 +102,7 @@ import random
 import string
 from captcha.image import ImageCaptcha
 from io import BytesIO
+from PIL import Image
 from database import authenticate_user
 
 # Generate random CAPTCHA text
@@ -119,8 +120,13 @@ def show_login():
 
     # Generate CAPTCHA image in memory
     image = ImageCaptcha(width=280, height=90)
-    captcha_image = image.generate(st.session_state.captcha_text)
-    captcha_bytes = BytesIO(captcha_image.read())
+    captcha_data = image.generate(st.session_state.captcha_text).read()
+
+    # ✅ Convert binary data to a PIL Image for Streamlit
+    captcha_image = Image.open(BytesIO(captcha_data))
+    # captcha_image = image.generate(st.session_state.captcha_text)
+    # captcha_bytes = BytesIO(captcha_image.read())
+    
 
     # Create centered column layout
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -139,7 +145,7 @@ def show_login():
             password = st.text_input("Password", type="password")
 
             # CAPTCHA display
-            st.image(captcha_bytes, caption="Enter the CAPTCHA text above")
+            st.image(captcha_image, caption="Enter the CAPTCHA text above")
             captcha_input = st.text_input("Enter CAPTCHA")
 
             if st.button("Login"):
