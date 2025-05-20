@@ -45,7 +45,7 @@ sib-api-v3-sdk==7.6.0
 six==1.17.0
 smmap==5.0.2
 SQLAlchemy==2.0.40
-streamlit==1.44.1
+streamlit==1.45.1
 streamlit-autorefresh==1.0.1
 streamlit-javascript==0.1.5
 streamlit-js-eval==0.1.7
