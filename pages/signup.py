@@ -171,7 +171,7 @@ def show_signup():
             st.markdown(
                 """
                 <div style="text-align: center;">
-                    <h2>Create New Account 🆕</h2>
+                    <h2>🆕 Create New Account</h2>
                 </div>
                 """,
                 unsafe_allow_html=True

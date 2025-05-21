@@ -166,7 +166,7 @@ def show_forgot_password():
             st.markdown(
                 """
                 <div style="text-align: center;">
-                    <h2>Reset Your Password 🔐</h2>
+                    <h2>🔐 Reset Your Password</h2>
                 </div>
                 """,
                 unsafe_allow_html=True
