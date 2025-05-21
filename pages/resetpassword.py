@@ -125,8 +125,12 @@ def show_reset_password(token):
         st.empty()
 
     # Initialize CAPTCHA in session state
-    if 'captcha_text' not in st.session_state:
+    # if 'captcha_text' not in st.session_state:
+    #     st.session_state.captcha_text = generate_captcha_text()
+
+    if 'captcha_text' not in st.session_state or st.session_state.get('refresh_captcha', True):
         st.session_state.captcha_text = generate_captcha_text()
+        st.session_state.refresh_captcha = False
 
     # Generate CAPTCHA image in memory
     image = ImageCaptcha(width=280, height=90)
@@ -150,7 +154,7 @@ def show_reset_password(token):
             st.markdown(
                 """
                 <div style="text-align: center;">
-                    <h2>🔑 Set New Password</h2>
+                    <h2>Set New Password 🔑</h2>
                 </div>
                 """,
                 unsafe_allow_html=True
