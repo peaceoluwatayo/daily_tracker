@@ -5,21 +5,21 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
 
-# # Load environment variables
-# load_dotenv()
-
-# # Database credentials
-# DB_SERVER = os.getenv("DB_SERVER")
-# DB_NAME = os.getenv("DB_NAME")
-# DB_USERNAME = os.getenv("DB_USERNAME")
-# DB_PASSWORD = os.getenv("DB_PASSWORD")
-
+# Load environment variables
+load_dotenv()
 
 # Database credentials
-DB_SERVER = st.secrets["azure_db"]["server"]
-DB_NAME = st.secrets["azure_db"]["name"]
-DB_USERNAME = st.secrets["azure_db"]["username"]
-DB_PASSWORD = st.secrets["azure_db"]["password"]
+DB_SERVER = os.getenv("DB_SERVER")
+DB_NAME = os.getenv("DB_NAME")
+DB_USERNAME = os.getenv("DB_USERNAME")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
+
+# # Database credentials
+# DB_SERVER = st.secrets["azure_db"]["server"]
+# DB_NAME = st.secrets["azure_db"]["name"]
+# DB_USERNAME = st.secrets["azure_db"]["username"]
+# DB_PASSWORD = st.secrets["azure_db"]["password"]
 
 # Database connection string
 conn_str = (
