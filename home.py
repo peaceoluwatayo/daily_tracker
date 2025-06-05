@@ -23,8 +23,8 @@ def main():
         show_signup()
     elif st.session_state.page == "forgot_password":
         show_forgot_password()
-    elif st.session_state.page == "first":
-        show_home_page()
+    # elif st.session_state.page == "first":
+    #     show_home_page()
     elif st.session_state.page == "dashboard":
         show_dashboard()
     elif st.session_state.page == "tracker_form":

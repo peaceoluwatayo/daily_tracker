@@ -151,19 +151,29 @@ def plot_pie_chart(df, column, title, color_sequence=px.colors.sequential.Blues)
 # ======================= #
 
 def show_dashboard():
-    st.markdown("<h1 style='text-align: center;'>📊 Dashboard</h1>", unsafe_allow_html=True)
 
-    # Navigation
-    col1, col2 = st.columns([8, 1])
+    # Create empty columns to push the actual buttons to the right
+    empty_col, col1, col2, col3 = st.columns([8, 3, 2, 2])
+
     with col1:
-        if st.button("Back to Home"):
-            st.session_state.page = "first"
+        if st.button("📋 Fill Daily Tracker Form"):
+            st.session_state.page = "tracker_form"
             st.rerun()
+
     with col2:
+        if st.button("📜 View History"):
+            st.session_state.page = "history"
+            st.rerun()
+
+    with col3:
         if st.button("Logout"):
             st.session_state.clear()
             st.session_state.page = "login"
             st.rerun()
+
+
+    st.markdown("<h1 style='text-align: center;'>📊 Dashboard</h1>", unsafe_allow_html=True)
+
 
     # Load custom styles
     try:

@@ -30,19 +30,29 @@ conn_str = (
 )
 
 def show_history():
-    st.markdown("<h1 style='text-align: center;'>📜 History</h1>", unsafe_allow_html=True)
 
-    # Place Back to Home on the left and Logout on the right
-    col1, col2 = st.columns([8, 1])
+        # Create empty columns to push the actual buttons to the right
+    empty_col, col1, col2, col3 = st.columns([8, 3, 3, 2])
+
     with col1:
-        if st.button("Back to Home"):
-            st.session_state.page = "first"  # or "home" depending on your naming
+        if st.button("📋 Fill Daily Tracker Form"):
+            st.session_state.page = "tracker_form"
             st.rerun()
+
     with col2:
+        if st.button("📊 View Dashboard"):
+            st.session_state.page = "dashboard"
+            st.rerun()
+
+    with col3:
         if st.button("Logout"):
             st.session_state.clear()
             st.session_state.page = "login"
             st.rerun()
+
+
+    st.markdown("<h1 style='text-align: center;'>📜 History</h1>", unsafe_allow_html=True)
+
 
     # Check for logged-in user
     username = st.session_state.get("username")

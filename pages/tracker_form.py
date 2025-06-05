@@ -355,18 +355,28 @@ import streamlit as st
 from database import save_entry_to_db, save_scores_to_db, has_filled_form_today
 
 def show_tracker_form():
-    st.markdown("<h1 style='text-align: center;'>📝 Daily Tracker Form</h1>", unsafe_allow_html=True)
+    
+    # Create empty columns to push the actual buttons to the right
+    empty_col, col1, col2, col3 = st.columns([8, 3, 2, 2])
 
-    col1, col2 = st.columns([8, 1])
     with col1:
-        if st.button("Back to Home"):
-            st.session_state.page = "first"
+        if st.button("📊 View Dashboard"):
+            st.session_state.page = "dashboard"
             st.rerun()
+
     with col2:
+        if st.button("📜 View History"):
+            st.session_state.page = "history"
+            st.rerun()
+
+    with col3:
         if st.button("Logout"):
             st.session_state.clear()
             st.session_state.page = "login"
             st.rerun()
+
+
+    st.markdown("<h1 style='text-align: center;'>📝 Daily Tracker Form</h1>", unsafe_allow_html=True)
 
     username = st.session_state.get("username")
     if has_filled_form_today(username):

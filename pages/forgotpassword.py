@@ -114,30 +114,36 @@
 
 
 
-# with captcha
 import streamlit as st
 from database import verify_user_token
 from utils.email_utils import send_password_reset_email
 from pages import show_reset_password
-import re
 import random
 import string
 from captcha.image import ImageCaptcha
 from io import BytesIO
-from PIL import Image
 
 # Generate random CAPTCHA text
 def generate_captcha_text(length=5):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 def show_forgot_password():
+    # If reset link was sent previously, show only success message
+    if st.session_state.get("reset_link_sent", False):
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.success("✅ A password reset link has been sent to your email.")
+            if st.button("Back to Login"):
+                st.session_state.page = "login"
+                st.session_state.reset_link_sent = False
+                st.rerun()
+    
+        return  # Exit early to prevent rendering the form again
+    
+
     # Add vertical space to center form
     for _ in range(6):
         st.empty()
-
-    # Initialize CAPTCHA in session state
-    # if 'captcha_text' not in st.session_state:
-    #     st.session_state.captcha_text = generate_captcha_text()
 
     if 'captcha_text' not in st.session_state or st.session_state.get('refresh_captcha', True):
         st.session_state.captcha_text = generate_captcha_text()
@@ -149,53 +155,43 @@ def show_forgot_password():
     captcha_image = image.generate_image(captcha_text)
     buffer = BytesIO()
     captcha_image.save(buffer, format="PNG")
-    
-    # captcha_data = image.generate(st.session_state.captcha_text).read()
-    # captcha_image = image.generate(st.session_state.captcha_text)
-    # captcha_bytes = BytesIO(captcha_image.read())
 
-    # ✅ Convert binary data to a PIL Image for Streamlit
-    # captcha_image = Image.open(BytesIO(captcha_data))
-
-
-
-    # Center horizontally with columns
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         with st.container():
             st.markdown(
-                """
-                <div style="text-align: center;">
-                    <h2>🔐 Reset Your Password</h2>
-                </div>
-                """,
-                unsafe_allow_html=True
+                "<div style='text-align: center;'><h2>🔐 Reset Your Password</h2></div>",
+                unsafe_allow_html=True,
             )
 
-            email = st.text_input("Enter your email address")
+            with st.form("forgot_password_form"):
+                email = st.text_input("Enter your email address")
 
-            # CAPTCHA
-            st.image(captcha_image, caption="Enter the CAPTCHA text above")
-            captcha_input = st.text_input("Enter CAPTCHA")
+                # CAPTCHA
+                st.image(buffer.getvalue(), caption="Enter the CAPTCHA text above")
+                captcha_input = st.text_input("Enter CAPTCHA")
 
-            if st.button("Send Reset Link"):
-                if email and captcha_input:
-                    if captcha_input.strip() != st.session_state.captcha_text:
-                        st.warning("❌ CAPTCHA did not match. Please try again.")
-                    else:
-                        success = send_password_reset_email(email)
-                        if success:
-                            st.success("✅ A password reset link has been sent to your email.")
+                submitted = st.form_submit_button("Send Reset Link")
+
+                if submitted:
+                    if email and captcha_input:
+                        if captcha_input.strip() != st.session_state.captcha_text:
+                            st.warning("❌ CAPTCHA did not match. Please try again.")
+                            st.session_state.refresh_captcha = False
                         else:
-                            st.error("❌ Email not found or error sending email.")
-                else:
-                    st.warning("Please enter your email address and CAPTCHA.")
+                            success = send_password_reset_email(email)
+                            if success:
+                                st.session_state.reset_link_sent = True
+                                st.rerun()
+                            else:
+                                st.error("❌ Email not found or error sending email.")
+                    else:
+                        st.warning("Please enter your email address and CAPTCHA.")
 
             if st.button("Back to Login"):
                 st.session_state.page = "login"
                 st.rerun()
 
-    # Add bottom vertical spacing
     for _ in range(4):
         st.empty()
 

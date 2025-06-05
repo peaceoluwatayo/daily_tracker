@@ -95,94 +95,64 @@
 
 
 
-# With captcha
 import streamlit as st
-import re
 import random
 import string
 from captcha.image import ImageCaptcha
 from io import BytesIO
-from PIL import Image
 from database import authenticate_user
 
-# Generate random CAPTCHA text
 def generate_captcha_text(length=5):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 def show_login():
-    # Add vertical spacing to center the content
     for _ in range(6):
         st.empty()
 
-    # Initialize CAPTCHA in session state if not already initialized
-    # if 'captcha_text' not in st.session_state:
-    #     st.session_state.captcha_text = generate_captcha_text()
-    
     if 'captcha_text' not in st.session_state or st.session_state.get('refresh_captcha', True):
         st.session_state.captcha_text = generate_captcha_text()
         st.session_state.refresh_captcha = False
 
-    # Generate CAPTCHA image in memory
     image = ImageCaptcha(width=280, height=90)
     captcha_text = st.session_state.captcha_text
-    captcha_image = image.generate_image(captcha_text)
     buffer = BytesIO()
+    captcha_image = image.generate_image(captcha_text)
     captcha_image.save(buffer, format="PNG")
 
-
-    
-
-    # captcha_data = image.generate(st.session_state.captcha_text).read()
-
-    # ✅ Convert binary data to a PIL Image for Streamlit
-    # captcha_image = Image.open(BytesIO(captcha_data))
-    # captcha_image = image.generate(st.session_state.captcha_text)
-    # captcha_bytes = BytesIO(captcha_image.read())
-    
-
-
-
-    # Create centered column layout
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         with st.container():
-            st.markdown(
-                """
-                <div style="text-align: center;">
-                    <h2>📘 Daily Journal Tracker</h2>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown("<div style='text-align: center;'><h2>📘 Daily Journal Tracker</h2></div>", unsafe_allow_html=True)
 
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
+            with st.form("login_form"):
+                username = st.text_input("Username")
+                password = st.text_input("Password", type="password")
 
-            # CAPTCHA display
-            st.image(buffer.getvalue(), caption="Enter the CAPTCHA text above")
-            captcha_input = st.text_input("Enter CAPTCHA")
+                st.image(buffer.getvalue(), caption="Enter the CAPTCHA text above")
+                captcha_input = st.text_input("Enter CAPTCHA")
 
-            if st.button("Login"):
-                # Check if the CAPTCHA input is correct (case-sensitive)
-                if username and password and captcha_input:
-                    if captcha_input.strip() != st.session_state.captcha_text:
-                        # Display an error message for incorrect CAPTCHA
-                        st.error("❌ CAPTCHA did not match. Please try again.")
-                    else:
-                        # If CAPTCHA matches, continue with authentication
-                        result = authenticate_user(username, password)
-                        if result == "unverified":
-                            st.warning("⚠️ Please verify your email before logging in.")
-                        elif result == "success":
-                            st.session_state.logged_in = True
-                            st.session_state.username = username
-                            st.session_state.page = "first"
-                            st.rerun()
+                submitted = st.form_submit_button("Login")
+
+                if submitted:
+                    if username and password and captcha_input:
+                        if captcha_input.strip() != st.session_state.captcha_text:
+                            st.error("❌ CAPTCHA did not match. Please try again.")
+                            st.session_state.refresh_captcha = False
                         else:
-                            st.error("❌ Invalid username or password.")
-                else:
-                    st.warning("Please enter both username and password, and solve the CAPTCHA.")
+                            result = authenticate_user(username, password)
+                            if result == "unverified":
+                                st.warning("⚠️ Please verify your email before logging in.")
+                            elif result == "success":
+                                st.session_state.logged_in = True
+                                st.session_state.username = username
+                                st.session_state.page = "dashboard"
+                                st.rerun()
+                            else:
+                                st.error("❌ Invalid username or password.")
+                    else:
+                        st.warning("Please enter both username and password, and solve the CAPTCHA.")
 
+            # Buttons outside form
             col_a, col_b = st.columns(2)
             with col_a:
                 if st.button("Sign Up"):
@@ -193,6 +163,5 @@ def show_login():
                     st.session_state.page = "forgot_password"
                     st.rerun()
 
-    # Add vertical spacing after the form
     for _ in range(4):
         st.empty()

@@ -13,10 +13,10 @@ load_dotenv()
 # Brevo settings
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL")
-BASE_URL = "https://daily-journal-tracker.onrender.com" 
+# BASE_URL = "https://daily-journal-tracker.onrender.com" 
 
 
-# BASE_URL = "http://localhost:8501"  # Update this URL after deployment
+BASE_URL = "http://localhost:8501"  # Update this URL after deployment
 
 # Database credentials
 DB_SERVER = os.getenv("DB_SERVER")
@@ -96,10 +96,12 @@ def verify_user_token(token):
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT username FROM Users WHERE token = ?", token)
+            # Check if token exists and not used
+            cursor.execute("SELECT username FROM Users WHERE token = ? AND token_used = 0", (token,))
             row = cursor.fetchone()
             if row:
-                cursor.execute("UPDATE Users SET verified = 1 WHERE token = ?", token)
+                # Mark user as verified and token as used
+                cursor.execute("UPDATE Users SET verified = 1, token_used = 1 WHERE token = ?", (token,))
                 conn.commit()
                 return True
             return False
@@ -107,16 +109,19 @@ def verify_user_token(token):
         print("Token verification error:", e)
         return False
 
+
 def reset_password(token, new_password):
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT username FROM Users WHERE token = ?", token)
+            # Check if token exists and not used
+            cursor.execute("SELECT username FROM Users WHERE token = ? AND token_used = 0", (token,))
             row = cursor.fetchone()
             if row:
                 hashed_password = hash_password(new_password)
+                # Update password and mark token as used
                 cursor.execute(
-                    "UPDATE Users SET password = ? WHERE token = ?",
+                    "UPDATE Users SET password = ?, token_used = 1 WHERE token = ?",
                     (hashed_password.decode('utf-8'), token)
                 )
                 conn.commit()
