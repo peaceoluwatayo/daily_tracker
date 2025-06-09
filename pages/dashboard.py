@@ -161,7 +161,7 @@ def show_dashboard():
             st.rerun()
 
     with col2:
-        if st.button("📜 View History"):
+        if st.button("📜 History"):
             st.session_state.page = "history"
             st.rerun()
 
